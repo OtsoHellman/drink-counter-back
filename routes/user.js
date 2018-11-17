@@ -1,30 +1,42 @@
 const express = require('express')
 
 const User = require('../models/user')
+const Drink = require('../models/drink')
+const getKonni = require('../utils/konniCalculator').getKonni
 
 const router = express.Router()
 
 router.get('/:username', (request, response) => {
     const username = request.params.username
-    User.findOne({
-        username,
-    }, (err, user) => {
-        if (err) {
-            return response.status(500).json({
-                error: err.message,
-            })
-        }
+
+    Promise.all([
+        Drink.find({
+            username,
+        }).exec(),
+        User.findOne({
+            username,
+        }).exec()
+    ]).then(([drinks, user]) => {
         if (!user) {
             return response.status(404).json({
                 error: 'User not found',
             })
         }
-        response.json(user)
+        const userObject = user.toObject()
+
+        response.json({
+            ...userObject,
+            konni: getKonni(userObject, drinks)
+        })
+    }).catch((err) => {
+        return response.status(500).json({
+            error: err.message,
+        })
     })
 })
 
 router.get('/', (request, response) => {
-    User.find({}, function(err, users) {
+    User.find({}, (err, users) => {
         if (err) {
             return response.status(500).json({
                 error: err.message,
