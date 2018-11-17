@@ -7,24 +7,34 @@ const dotenv = require('dotenv')
 
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config()
-    app.use(morgan(':method :url :data :status :res[content-length] - :response-time ms'))
+    app.use(morgan(':method :url :status :res[content-length] - :response-time ms'))
 }
 
 const connection = require('./connection')
 connection.connect()
 
-const example = require('./routes/example')
+const user = require('./routes/user')
 
 app.use(cors())
 app.use(bodyParser.json())
 
-app.use('/api/example', example)
+app.use('/users', user)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
 
-app.use((req, res, next, err) => {
-    console.log(err)
+// Handle 404
+app.use(function(req, res) {
+    res.status(404).json({
+        error: 'Page not Found',
+    });
 })
+
+// Handle 500
+app.use(function(error, req, res, next) {
+    console.log(error)
+    res.send('500: Internal Server Error', 500);
+})
+
