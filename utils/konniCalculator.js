@@ -11,4 +11,4 @@ const getKonni = (user, drinks) => {
     return 10 * ((0.806*numberOfDrinks*1.2)/(BW*mass) - MR*drinkingPeriod)
 }
 
-module.exports = getKonni
+exports.getKonni = getKonni
