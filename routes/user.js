@@ -23,11 +23,10 @@ router.get('/:username', (request, response) => {
             })
         }
         const userObject = user.toObject()
-        const drinkArr = drinks.map(drink => drink.timestamp)
 
         response.json({
             ...userObject,
-            konni: getKonni(userObject, drinkArr)
+            konni: getKonni(userObject, drinks)
         })
     }).catch((err) => {
         return response.status(500).json({
