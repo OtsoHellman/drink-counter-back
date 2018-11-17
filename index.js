@@ -3,6 +3,12 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
+const dotenv = require('dotenv')
+
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config()
+    app.use(morgan(':method :url :data :status :res[content-length] - :response-time ms'))
+}
 
 const connection = require('./connection')
 connection.connect()
@@ -11,10 +17,6 @@ const example = require('./routes/example')
 
 app.use(cors())
 app.use(bodyParser.json())
-
-if (process.env.NODE_ENV !== 'production') {
-    app.use(morgan(':method :url :data :status :res[content-length] - :response-time ms'))
-}
 
 app.use('/api/example', example)
 
