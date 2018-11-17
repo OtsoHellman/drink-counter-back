@@ -14,11 +14,13 @@ const connection = require('./connection')
 connection.connect()
 
 const user = require('./routes/user')
+const drink = require('./routes/drink')
 
 app.use(cors())
 app.use(bodyParser.json())
 
 app.use('/users', user)
+app.use('/drinks', drink)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
