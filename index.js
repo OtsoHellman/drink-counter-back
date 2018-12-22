@@ -19,10 +19,10 @@ const drink = require('./routes/drink')
 app.use(cors())
 app.use(bodyParser.json())
 
-app.use('/users', user)
-app.use('/drinks', drink)
+app.use('/api/user', user)
+app.use('/api/drink', drink)
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
