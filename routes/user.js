@@ -6,7 +6,7 @@ const getKonni = require('../utils/konniCalculator').getKonni
 
 const router = express.Router()
 
-router.get('/:username', (request, response) => {
+router.get('/getUser/:username', (request, response) => {
     const username = request.params.username
 
     Promise.all([
@@ -43,6 +43,28 @@ router.get('/', (request, response) => {
             })
         }
         response.json(users)
+    })
+})
+
+router.get('/allWithKonni', (request, response) => {
+    Promise.all([
+        Drink.find({}).exec(),
+        User.find({}).exec()
+    ]).then(([drinks, users]) => {
+        let resAgg = []
+        for (let userObject of users) {
+            const username = userObject.username
+            const userDrinks = drinks.filter(drink => drink.username === username)
+            resAgg.push({
+                username,
+                konni: getKonni(userObject, userDrinks)
+            })
+        }
+        response.send(resAgg)
+    }).catch((err) => {
+        return response.status(500).json({
+            error: err.message,
+        })
     })
 })
 
