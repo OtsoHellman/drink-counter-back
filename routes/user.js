@@ -56,8 +56,8 @@ router.get('/allWithKonni', (request, response) => {
             const username = userObject.username
             const userDrinks = drinks.filter(drink => drink.username === username)
             resAgg.push({
-                username,
-                konni: getKonni(userObject, userDrinks)
+                x: username,
+                y: getKonni(userObject, userDrinks)
             })
         }
         response.send(resAgg)
