@@ -7,9 +7,16 @@ const router = express.Router()
 
 router.post('/', (request, response) => {
     const username = request.body.username
+    const drinkSize = request.body.drinkSize
     if (!username) {
         return response.status(400).json({
             error: 'username missing'
+        })
+    }
+
+    if (!drinkSize || typeof(drinkSize) !== 'number') {
+        return response.status(400).json({
+            error: 'invalid or missing drinkSize'
         })
     }
 
@@ -24,6 +31,7 @@ router.post('/', (request, response) => {
         
         new Drink({
             username,
+            drinkSize,
             timestamp: Date.now(),
         }).save((err, drink) => {
             if (err) {
