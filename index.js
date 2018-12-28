@@ -20,6 +20,7 @@ const drink = require('./routes/drink')
 const userHandler = require('./handlers/userHandler')
 
 app.use(cors())
+app.use(express.static('build'))
 app.use(bodyParser.json())
 
 app.use('/api/user', user)
