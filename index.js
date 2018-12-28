@@ -5,7 +5,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const dotenv = require('dotenv')
 const server = require('http').Server(app)
-var io = require('socket.io')(server)
+let io = require('socket.io')(server)
 
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config()
@@ -25,6 +25,8 @@ app.use(bodyParser.json())
 app.use('/api/user', user)
 app.use('/api/drink', drink)
 
+userHandler.initialize(io)
+
 const PORT = process.env.PORT || 3001
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
@@ -32,13 +34,13 @@ server.listen(PORT, () => {
 
 io.on('connection', (socket) => {
     console.log('user connected')
-    userHandler.emitAllWithKonni(socket)
+    userHandler.emitSocketAllWithKonni(socket)
 
     let allWithKonni = setInterval(
         () => {
-            userHandler.emitAllWithKonni(socket)
+            userHandler.emitSocketAllWithKonni(socket)
         },
-        100
+        1000
     )
     socket.on('disconnect', () => {
         clearInterval(allWithKonni)
