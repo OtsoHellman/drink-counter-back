@@ -3,8 +3,8 @@ const Drink = require('../models/drink')
 
 const getKonni = require('../utils/konniCalculator').getKonni
 
-const allWithKonni = (request, response) => {
-    Promise.all([
+const allWithKonni = () => {
+    return Promise.all([
         Drink.find({}).exec(),
         User.find({}).exec()
     ]).then(([drinks, users]) => {
@@ -17,12 +17,27 @@ const allWithKonni = (request, response) => {
                 y: getKonni(userObject, userDrinks)
             })
         }
-        return response.send(resAgg)
-    }).catch((err) => {
-        return response.status(500).json({
-            error: err.message,
-        })
+        return resAgg
     })
+}
+
+const emitAllWithKonni = (socket) => {
+    allWithKonni()
+        .then((konni) => {
+            socket.emit("allWithKonni", { data: konni })
+        })
+}
+
+const getAllWithKonni = (request, response) => {
+    return allWithKonni()
+        .then((resAgg) => {
+            return response.send(resAgg)
+        })
+        .catch((err) => {
+            return response.status(500).json({
+                error: err.message,
+            })
+        })
 }
 
 const getUser = (request, response) => {
@@ -98,7 +113,8 @@ const getAll = (request, response) => {
 }
 
 
-exports.allWithKonni = allWithKonni
+exports.getAllWithKonni = getAllWithKonni
+exports.emitAllWithKonni = emitAllWithKonni
 exports.getUser = getUser
 exports.getAll = getAll
 exports.postUser = postUser

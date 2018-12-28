@@ -11,7 +11,7 @@ router.get('/', (request, response) => {
 })
 
 router.get('/allWithKonni', (request, response) => {
-    userHandler.allWithKonni(request, response)
+    userHandler.getAllWithKonni(request, response)
 })
 
 router.post('/', (request, response) => {
