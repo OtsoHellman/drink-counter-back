@@ -12,7 +12,7 @@ const postDrink = (request, response) => {
         })
     }
 
-    if (!drinkSize || typeof(drinkSize) !== 'number') {
+    if (!drinkSize || typeof(drinkSize) !== 'number' || drinkSize <= 0) {
         return response.status(400).json({
             error: 'invalid or missing drinkSize'
         })
