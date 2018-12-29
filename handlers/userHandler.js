@@ -88,9 +88,9 @@ const postUser = (request, response) => {
             error: 'username missing'
         })
     }
-    if (!user.mass) {
+    if (!user.mass || user.mass > 9001) {
         return response.status(400).json({
-            error: 'mass missing'
+            error: 'mass missing or invalid'
         })
     }
     if (!user.gender) {
