@@ -12,7 +12,7 @@ const User = mongoose.model('User', new mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ['male', 'female'],
+        enum: ['male', 'female', 'other'],
     },
 }))
 
