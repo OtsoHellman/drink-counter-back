@@ -35,4 +35,4 @@ const getDrinkingPeriod = (drink1, drink2) => {
     return (drink2 - drink1) / (3600 * 1000)
 }
 
-module.exports = getKonni
+exports.getKonni = getKonni
