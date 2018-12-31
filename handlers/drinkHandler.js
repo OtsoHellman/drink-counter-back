@@ -6,9 +6,16 @@ const userHandler = require('./userHandler')
 const postDrink = (request, response) => {
     const username = request.body.username
     const drinkSize = request.body.drinkSize
+    const drinkType = request.body.drinkType
     if (!username) {
         return response.status(400).json({
             error: 'username missing'
+        })
+    }
+
+    if (!drinkType) {
+        return response.status(400).json({
+            error: 'drinkType missing'
         })
     }
 
@@ -30,6 +37,7 @@ const postDrink = (request, response) => {
         new Drink({
             username,
             drinkSize,
+            drinkType,
             timestamp: Date.now(),
         }).save((err, drink) => {
             if (err) {
