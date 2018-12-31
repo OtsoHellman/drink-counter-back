@@ -1,7 +1,7 @@
 const User = require('../models/user')
 const Drink = require('../models/drink')
 
-const getKonni = require('../utils/konniCalculator').getKonni
+const konniCalculator = require('../utils/konniCalculator')
 
 let io;
 
@@ -14,37 +14,50 @@ const allWithKonni = () => {
         Drink.find({}).exec(),
         User.find({}).exec()
     ]).then(([drinks, users]) => {
-        let resAgg = []
+        let data = []
+        let timestamps = []
         for (let userObject of users) {
             const username = userObject.username
             const userDrinks = drinks.filter(drink => drink.username === username)
-            resAgg.push({
+            data.push({
                 x: username,
-                y: getKonni(userObject, userDrinks)
+                y: konniCalculator.getKonni(userObject, userDrinks)
+            })
+            timestamps.push({
+                username,
+                graphData: konniCalculator.getTimestamps(userObject, userDrinks)
             })
         }
-        return resAgg
+        const firstDrink = Math.min(...timestamps.filter(user => user.graphData.length > 0).map(user => user.graphData[0].x))
+        timestamps.map(user => (
+            user.graphData.unshift({ x: firstDrink, y: 0 })
+        ))
+
+        return {
+            data,
+            timestamps
+        }
     })
 }
 
 const emitAllWithKonni = () => {
     allWithKonni()
-        .then((konni) => {
-            io.emit("allWithKonni", { data: konni })
+        .then((konniObject) => {
+            io.emit("allWithKonni", konniObject)
         })
 }
 
 const emitSocketAllWithKonni = (socket) => {
     allWithKonni()
-        .then((konni) => {
-            socket.emit("allWithKonni", { data: konni })
+        .then((konniObject) => {
+            socket.emit("allWithKonni", konniObject)
         })
 }
 
 const getAllWithKonni = (request, response) => {
     return allWithKonni()
-        .then((resAgg) => {
-            return response.send(resAgg)
+        .then((konniObject) => {
+            return response.json(konniObject)
         })
         .catch((err) => {
             return response.status(500).json({
@@ -72,7 +85,7 @@ const getUser = (request, response) => {
 
         return response.json({
             ...userObject,
-            konni: getKonni(userObject, drinks)
+            konni: konniCalculator.getKonni(userObject, drinks)
         })
     }).catch((err) => {
         return response.status(500).json({
