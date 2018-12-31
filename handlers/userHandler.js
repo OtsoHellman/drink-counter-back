@@ -85,9 +85,20 @@ const getUser = (request, response) => {
         }
         const userObject = user.toObject()
 
+        drinkMap = {}
+
+        for (let drinkObject of drinks) {
+            const drinkType = drinkObject.drinkType
+            drinkMap[drinkType] = drinkMap[drinkType] ? drinkMap[drinkType] + 1 : 1
+        }
+        
+        keysSorted = Object.keys(drinkMap).sort((a,b) => drinkMap[b]-drinkMap[a])
+
         return response.json({
             ...userObject,
-            konni: konniCalculator.getKonni(userObject, drinks)
+            konni: konniCalculator.getKonni(userObject, drinks),
+            drinkMap,
+            keysSorted
         })
     }).catch((err) => {
         return response.status(500).json({
