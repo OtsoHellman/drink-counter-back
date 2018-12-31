@@ -28,7 +28,9 @@ const allWithKonni = () => {
                 graphData: konniCalculator.getTimestamps(userObject, userDrinks)
             })
         }
-        const firstDrink = Math.min(...timestamps.filter(user => user.graphData.length > 0).map(user => user.graphData[0].x))
+        const currentTimeStamps = timestamps.filter(user => user.graphData.length > 0)
+        const firstDrink = currentTimeStamps.length > 0 ? Math.min(...currentTimeStamps.map(user => user.graphData[0].x)) : Date.now()
+
         timestamps.map(user => (
             user.graphData.unshift({ x: firstDrink, y: 0 })
         ))

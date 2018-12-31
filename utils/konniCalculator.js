@@ -38,11 +38,12 @@ const getStartingTime = (user, drinks) => {
             numberOfDrinks = drinkSize
         }
     }
+    //enable this to clear users with 0 konni from graph:
 
-    if (calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, Date.now()), numberOfDrinks) === 0) {
-        startingTime = Date.now(),
-        numberOfDrinks = 0
-    }
+    //if (calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, Date.now()), numberOfDrinks) <= 0) {
+    //    startingTime = Date.now()
+    //    numberOfDrinks = 0
+    //}
 
     return {
         startingTime,
@@ -62,6 +63,9 @@ const getTimestamps = (user, drinks) => {
     const startingTime = getStartingTime(user, drinks).startingTime
     const currentDrinks = drinks.filter(drink => drink.timestamp >= startingTime)
 
+    if (currentDrinks.length <= 0) {
+        return []
+    }
 
     resAgg = []
     let numberOfDrinks = 0
