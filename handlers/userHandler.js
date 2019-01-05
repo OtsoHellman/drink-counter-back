@@ -88,8 +88,8 @@ const getUser = (request, response) => {
         drinkMap = {}
 
         for (let drinkObject of drinks) {
-            const drinkTypeId = drinkObject.drinkType._id
-            drinkMap[drinkTypeId] = drinkMap[drinkTypeId] ? drinkMap[drinkTypeId] + 1 : 1
+            const drinkName = drinkObject.drinkType.drinkName
+            drinkMap[drinkName] = drinkMap[drinkName] ? drinkMap[drinkName] + 1 : 1
         }
         
         keysSorted = Object.keys(drinkMap).sort((a,b) => drinkMap[b]-drinkMap[a])
