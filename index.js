@@ -17,6 +17,7 @@ connection.connect()
 
 const user = require('./routes/user')
 const drink = require('./routes/drink')
+const drinkType = require('./routes/drinkType')
 const userHandler = require('./handlers/userHandler')
 
 app.use(cors())
@@ -24,6 +25,7 @@ app.use(bodyParser.json())
 
 app.use('/api/user', user)
 app.use('/api/drink', drink)
+app.use('/api/drinkType', drinkType)
 
 userHandler.initialize(io)
 
