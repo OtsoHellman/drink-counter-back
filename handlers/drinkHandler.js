@@ -7,41 +7,41 @@ const userHandler = require('./userHandler')
 
 const postDrink = (request, response) => {
     const username = request.body.username
-    const drinkName = request.body.drinkName
+    const drinkTypeId = request.body.drinkTypeId
     if (!username) {
         return response.status(400).json({
             error: 'username missing'
         })
     }
 
-    if (!drinkName) {
+    if (!drinkTypeId) {
         return response.status(400).json({
-            error: 'drinkName missing'
+            error: 'drink id missing'
         })
     }
 
     Promise.all([
-        DrinkType.findOne({
-            drinkName,
+        DrinkType.count({
+            _id: drinkTypeId,
         }).exec(),
         User.findOne({
             username,
         }).exec()
-    ]).then(([drinkType, user]) => {
+    ]).then(([count, user]) => {
         if (!user) {
             return response.status(400).json({
                 error: 'user not in database'
             })
         }
 
-        if (!drinkType) {
+        if (count <= 0) {
             return response.status(400).json({
                 error: 'drink type not in database'
             })
         }
         new Drink({
             username,
-            drinkType: drinkType._id,
+            drinkType: drinkTypeId,
             timestamp: Date.now(),
         }).save((err, drink) => {
             if (err) {

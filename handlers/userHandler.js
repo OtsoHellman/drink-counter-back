@@ -11,7 +11,7 @@ const initialize = (wsServer) => {
 
 const allWithKonni = () => {
     return Promise.all([
-        Drink.find({}).exec(),
+        Drink.find({}).populate('drinkType').exec(),
         User.find({}).exec()
     ]).then(([drinks, users]) => {
         let data = []
@@ -88,8 +88,8 @@ const getUser = (request, response) => {
         drinkMap = {}
 
         for (let drinkObject of drinks) {
-            const drinkName = drinkObject.drinkType.drinkName
-            drinkMap[drinkName] = drinkMap[drinkName] ? drinkMap[drinkName] + 1 : 1
+            const drinkTypeId = drinkObject.drinkType._id
+            drinkMap[drinkTypeId] = drinkMap[drinkTypeId] ? drinkMap[drinkTypeId] + 1 : 1
         }
         
         keysSorted = Object.keys(drinkMap).sort((a,b) => drinkMap[b]-drinkMap[a])

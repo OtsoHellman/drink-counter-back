@@ -70,7 +70,7 @@ const getTimestamps = (user, drinks) => {
     resAgg = []
     let numberOfDrinks = 0
     for (let drink of currentDrinks) {
-        numberOfDrinks += drink.drinkSize
+        numberOfDrinks += drink.drinkType.drinkSize
         resAgg.push({
             x: drink.timestamp,
             y: Math.max(calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, drink.timestamp), numberOfDrinks),0)
