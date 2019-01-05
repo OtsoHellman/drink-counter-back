@@ -73,7 +73,7 @@ const getUser = (request, response) => {
     Promise.all([
         Drink.find({
             username,
-        }).exec(),
+        }).populate('drinkType').exec(),
         User.findOne({
             username,
         }).exec()
@@ -84,16 +84,15 @@ const getUser = (request, response) => {
             })
         }
         const userObject = user.toObject()
-
+        
         drinkMap = {}
 
         for (let drinkObject of drinks) {
-            const drinkType = drinkObject.drinkType
-            drinkMap[drinkType] = drinkMap[drinkType] ? drinkMap[drinkType] + 1 : 1
+            const drinkName = drinkObject.drinkType.drinkName
+            drinkMap[drinkName] = drinkMap[drinkName] ? drinkMap[drinkName] + 1 : 1
         }
         
         keysSorted = Object.keys(drinkMap).sort((a,b) => drinkMap[b]-drinkMap[a])
-
         return response.json({
             ...userObject,
             konni: konniCalculator.getKonni(userObject, drinks),

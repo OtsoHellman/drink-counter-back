@@ -27,7 +27,7 @@ const getStartingTime = (user, drinks) => {
     let numberOfDrinks = 0
     let startingTime = drinks[0].timestamp
     for (let i = 0; i < drinks.length; i++) {
-        const drinkSize = drinks[i].drinkSize
+        const drinkSize = drinks[i].drinkType.drinkSize
         numberOfDrinks += drinkSize
 
         const cumulativeKonni = calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, drinks[i].timestamp), numberOfDrinks)

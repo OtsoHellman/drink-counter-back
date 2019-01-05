@@ -1,43 +1,47 @@
 const User = require('../models/user')
+const DrinkType = require('../models/drinkType')
 const Drink = require('../models/drink')
+
 
 const userHandler = require('./userHandler')
 
 const postDrink = (request, response) => {
     const username = request.body.username
-    const drinkSize = request.body.drinkSize
-    const drinkType = request.body.drinkType
+    const drinkName = request.body.drinkName
     if (!username) {
         return response.status(400).json({
             error: 'username missing'
         })
     }
 
-    if (!drinkType) {
+    if (!drinkName) {
         return response.status(400).json({
-            error: 'drinkType missing'
+            error: 'drinkName missing'
         })
     }
 
-    if (!drinkSize || typeof(drinkSize) !== 'number' || drinkSize <= 0 || drinkSize > 5) {
-        return response.status(400).json({
-            error: 'invalid or missing drinkSize'
-        })
-    }
-
-    User.findOne({
-        username
-    }).then((user) => {
+    Promise.all([
+        DrinkType.findOne({
+            drinkName,
+        }).exec(),
+        User.findOne({
+            username,
+        }).exec()
+    ]).then(([drinkType, user]) => {
         if (!user) {
             return response.status(400).json({
                 error: 'user not in database'
             })
         }
-        
+
+        if (!drinkType) {
+            return response.status(400).json({
+                error: 'drink type not in database'
+            })
+        }
         new Drink({
             username,
-            drinkSize,
-            drinkType,
+            drinkType: drinkType._id,
             timestamp: Date.now(),
         }).save((err, drink) => {
             if (err) {
