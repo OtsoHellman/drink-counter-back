@@ -11,7 +11,7 @@ const initialize = (wsServer) => {
 
 const allWithKonni = () => {
     return Promise.all([
-        Drink.find({}).populate('drinkType').exec(),
+        Drink.find({}).sort({timestamp: 1 }).populate('drinkType').exec(),
         User.find({}).exec()
     ]).then(([drinks, users]) => {
         let data = []

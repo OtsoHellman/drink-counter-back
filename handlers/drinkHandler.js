@@ -8,6 +8,8 @@ const userHandler = require('./userHandler')
 const postDrink = (request, response) => {
     const username = request.body.username
     const drinkTypeId = request.body.drinkTypeId
+    const timeDelta = request.body.timeDelta
+    
     if (!username) {
         return response.status(400).json({
             error: 'username missing'
@@ -17,6 +19,12 @@ const postDrink = (request, response) => {
     if (!drinkTypeId) {
         return response.status(400).json({
             error: 'drink id missing'
+        })
+    }
+
+    if (typeof timeDelta === 'undefined') {
+        return response.status(400).json({
+            error: 'timeDelta missing'
         })
     }
 
@@ -42,7 +50,7 @@ const postDrink = (request, response) => {
         new Drink({
             username,
             drinkType: drinkTypeId,
-            timestamp: Date.now(),
+            timestamp: Date.now() - timeDelta,
         }).save((err, drink) => {
             if (err) {
                 throw err
