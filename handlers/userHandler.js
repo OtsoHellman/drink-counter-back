@@ -16,24 +16,52 @@ const allWithKonni = () => {
     ]).then(([drinks, users]) => {
         let data = []
         let timestamps = []
+
         for (let userObject of users) {
             const username = userObject.username
             const userDrinks = drinks.filter(drink => drink.username === username)
-            data.push({
-                x: username,
-                y: konniCalculator.getKonni(userObject, userDrinks)
-            })
-            timestamps.push({
-                username,
-                graphData: konniCalculator.getTimestamps(userObject, userDrinks)
-            })
-        }
-        const currentTimeStamps = timestamps.filter(user => user.graphData.length > 0)
-        const firstDrink = currentTimeStamps.length > 0 ? Math.min(...currentTimeStamps.map(user => user.graphData[0].x)) : Date.now()
+            const userKonni = konniCalculator.getKonni(userObject, userDrinks)
 
-        timestamps.map(user => (
-            user.graphData.unshift({ x: firstDrink, y: 0 })
+            if (userKonni > 0) {
+                data.push({
+                    x: username,
+                    y: userKonni
+                })
+                timestamps.push({
+                    username,
+                    graphData: konniCalculator.getTimestamps(userObject, userDrinks)
+                })
+
+            //don't hide users straight when their konni goes to 0, wait for "-1"
+            } else if (userKonni > -1) {
+                data.push({
+                    x: username,
+                    y: 0
+                })
+                timestamps.push({
+                    username,
+                    graphData: konniCalculator.getTimestamps(userObject, userDrinks)
+                })
+            }
+        }
+
+        timestamps.sort((a, b) => (
+            b.graphData[b.graphData.length - 1].y - a.graphData[a.graphData.length - 1].y
         ))
+
+        if (data.length <= 0) {
+            data = [{
+                x: '',
+                y: '0'
+            }]
+            timestamps = [{
+                username: '',
+                graphData: [{
+                    x: Date.now(),
+                    y: 9001
+                }]
+            }]
+        }
 
         return {
             data,
@@ -84,18 +112,18 @@ const getUser = (request, response) => {
             })
         }
         const userObject = user.toObject()
-        
+
         drinkMap = {}
 
-        for (let drinkObject of drinks) {
+        for (let drinkObject of drinks) {
             const drinkName = drinkObject.drinkType.drinkName
             drinkMap[drinkName] = drinkMap[drinkName] ? drinkMap[drinkName] + 1 : 1
         }
-        
-        keysSorted = Object.keys(drinkMap).sort((a,b) => drinkMap[b]-drinkMap[a])
+
+        keysSorted = Object.keys(drinkMap).sort((a, b) => drinkMap[b] - drinkMap[a])
         return response.json({
             ...userObject,
-            konni: konniCalculator.getKonni(userObject, drinks),
+            konni: konniCalculator.getKonniWithValidation(userObject, drinks),
             drinkMap,
             keysSorted
         })

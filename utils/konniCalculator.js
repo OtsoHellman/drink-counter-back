@@ -1,17 +1,17 @@
 const getKonni = (user, drinks) => {
     if (drinks.length <= 0) {
-        return 0
+        return -1
     }
 
-    const startingTimeObject = getStartingTime(user, drinks)
-    const startingTime = startingTimeObject.startingTime
-    const numberOfDrinks = startingTimeObject.numberOfDrinks
+    const { startingTime, numberOfDrinks } = getStartingTime(user, drinks)
 
-    const ans = Math.max(calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, Date.now()), numberOfDrinks), 0)
-
-    return ans
+    //can return negative values, use getKonniWithValidation if validation is needed
+    return calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, Date.now()), numberOfDrinks)
 }
 
+const getKonniWithValidation = (user, drinks) => {
+    return Math.max(getKonni(user, drinks), 0)
+}
 
 const calculateKonniByPeriod = (user, drinkingPeriod, numberOfDrinks) => {
     const mass = user.mass
@@ -20,14 +20,16 @@ const calculateKonniByPeriod = (user, drinkingPeriod, numberOfDrinks) => {
     //body water constant
     const BW = user.gender === 'male' ? 0.58 : 0.49
 
-    return 10 * ((0.806 * 1.2 * numberOfDrinks) / (BW * mass) - MR * drinkingPeriod)
+    const scalingFactor = 13.37
+
+    return scalingFactor * 10 * ((0.806 * 1.2 * numberOfDrinks) / (BW * mass) - MR * drinkingPeriod)
 }
 
 const getStartingTime = (user, drinks) => {
     let numberOfDrinks = 0
     let startingTime = drinks[0].timestamp
     for (let i = 0; i < drinks.length; i++) {
-        const drinkSize = drinks[i].drinkType.drinkSize
+        const { drinkSize } = drinks[i].drinkType
         numberOfDrinks += drinkSize
 
         const cumulativeKonni = calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, drinks[i].timestamp), numberOfDrinks)
@@ -38,12 +40,6 @@ const getStartingTime = (user, drinks) => {
             numberOfDrinks = drinkSize
         }
     }
-    //enable this to clear users with 0 konni from graph:
-
-    //if (calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, Date.now()), numberOfDrinks) <= 0) {
-    //    startingTime = Date.now()
-    //    numberOfDrinks = 0
-    //}
 
     return {
         startingTime,
@@ -69,6 +65,12 @@ const getTimestamps = (user, drinks) => {
 
     resAgg = []
     let numberOfDrinks = 0
+
+    resAgg.push({
+        x: currentDrinks[0].timestamp - (30*60*1000),
+        y: Math.max(calculateKonniByPeriod(user, getDrinkingPeriod(startingTime, currentDrinks[0].timestamp), numberOfDrinks),0)
+    })
+
     for (let drink of currentDrinks) {
         numberOfDrinks += drink.drinkType.drinkSize
         resAgg.push({
@@ -85,3 +87,4 @@ const getTimestamps = (user, drinks) => {
 
 exports.getKonni = getKonni
 exports.getTimestamps = getTimestamps
+exports.getKonniWithValidation = getKonniWithValidation
